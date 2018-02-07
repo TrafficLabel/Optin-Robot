@@ -16,69 +16,80 @@ import java.util.Date;
  */
 final class RobotTask implements Optin {
 
+    /**
+     * Load the sites from the file
+     * @return all the lines from the file
+     * @throws IOException ignored
+     */
     private static String[] loadSites() throws IOException {
         try (BufferedReader reader = new BufferedReader(new FileReader("sites.txt"))) {
             return reader.lines().map(String::trim).filter(line -> line.length() > 0).toArray(String[]::new);
         }
     }
 
+    /**
+     * Main task method, heart of where we start!
+     */
     @Override
     public void work() {
         try {
             Robot robot = new Robot();
             for (String sites : loadSites()) {
-                if (sites.length() == 0) { quit(); }
+                if (sites.length() == 0) quit();
+                // First page
                 robot.mouseMove(1500,300);
                 robot.mousePress(InputEvent.BUTTON1_MASK);
                 robot.mouseRelease(InputEvent.BUTTON1_MASK);
                 robot.delay(800);
+
+                // Second page
                 robot.mouseMove(1200,400);
                 robot.delay(800);
                 robot.mousePress(InputEvent.BUTTON1_MASK);
                 robot.mouseRelease(InputEvent.BUTTON1_MASK);
-
+                // Clipboard, to copy the latest site.
                 StringSelection stringSelection = new StringSelection(sites);
                 Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
                 clipboard.setContents(stringSelection, null);
+                // Paste our site into the box
+                pasteText(robot);
 
-                robot.keyPress(KeyEvent.VK_CONTROL);
-                robot.delay(200);
-                robot.keyPress(KeyEvent.VK_V);
-                robot.delay(200);
-                robot.keyRelease(KeyEvent.VK_V);
-                robot.delay(200);
-                robot.keyRelease(KeyEvent.VK_CONTROL);
-                robot.delay(200);
-
+                // Again, pastes into the next box
                 robot.mouseMove(1200,460);
                 robot.delay(500);
                 robot.mousePress(InputEvent.BUTTON1_MASK);
                 robot.mouseRelease(InputEvent.BUTTON1_MASK);
-
-                robot.keyPress(KeyEvent.VK_CONTROL);
-                robot.delay(200);
-                robot.keyPress(KeyEvent.VK_V);
-                robot.delay(200);
-                robot.keyRelease(KeyEvent.VK_V);
-                robot.delay(200);
-                robot.keyRelease(KeyEvent.VK_CONTROL);
-                robot.delay(200);
-
+                pasteText(robot);
+                // Submit data pasted.
                 robot.mouseMove(520,520);
                 robot.delay(500);
                 robot.mousePress(InputEvent.BUTTON1_MASK);
                 robot.mouseRelease(InputEvent.BUTTON1_MASK);
+                // Log for time purposes
                 System.out.printf("[%s] Created: %s.\n", new SimpleDateFormat("hh:mm:ss a").format(new Date()), sites);
-                robot.delay(3500); // Allowing time for the page to load back.
+                // Allowing time for the page to load back.
+                robot.delay(3500);
             }
         } catch (AWTException | IOException e) {
             e.printStackTrace();
         }
     }
 
-    @Override
-    public void quit() {
-        System.out.println("We out!");
-        System.exit(0);
+    /**
+     * We use this twice, so might as well create a little method for it
+     * @param robot the robot in use.
+     */
+    private void pasteText(Robot robot) {
+        robot.keyPress(KeyEvent.VK_CONTROL);
+        robot.delay(200);
+        robot.keyPress(KeyEvent.VK_V);
+        robot.delay(200);
+        robot.keyRelease(KeyEvent.VK_V);
+        robot.delay(200);
+        robot.keyRelease(KeyEvent.VK_CONTROL);
+        robot.delay(200);
     }
+
+    @Override
+    public void quit() {  System.exit(0);  }
 }
