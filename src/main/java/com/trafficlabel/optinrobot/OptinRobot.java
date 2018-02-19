@@ -5,7 +5,9 @@ package com.trafficlabel.optinrobot;
  */
 final class OptinRobot {
     public static void main(String[] args) {
-        RobotTask robotTask = new RobotTask();
-        robotTask.work();
+        //RobotTask robotTask = new RobotTask();
+        //robotTask.work();
+        UpdateList updateList = new UpdateList();
+        updateList.work();
     }
 }
